@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>assignment 05t</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+</head>
+<body>
+<script type="text/javascript">
+
+    // A globally accessible variable that can be referenced within any function.
+    // It will hold our data set.
+    // We don't actually need to use a global variable in this example, but you might in your projects.
+    var dataset;
+
+    // Load the data via the .csv() method.
+    d3.csv ( "data.csv", function ( error, data ) {
+
+        if ( error ) {
+            // This displays an error message in console if the data fails to load.
+            console.log ( "There was an error accessing your dataset." ) ;
+        } else {
+            // Print the data to the console.
+            // console.log(data);
+
+            // Assign the local variable 'data', which holds our CSV file info, to the global variable 'dataset'.
+            dataset = data ;
+
+            d3 // our d3 object.
+                    .select("body") // Select the element that we are going to append 'p' elements to.
+                    .selectAll("p") // Select all of the p elements we are going to create.
+                    .data(dataset) // Bind our data to the 'dataset' variable.
+                    .enter() // Go "inside" our dataset and begin looping through it.
+                    .append("p") // For each record in our dataset, add a new 'p' HTML element.
+                    .text( function ( d ) { // Insert text content into the 'p' element.
+                        // We use a function because each record of our dataset, 'd', is an object.
+                        // We use object.property notation to obtain the value of the field
+                        // of data. If a property has a space in its name, it will
+                        // require a different notation -- object['property name'] --
+                        // to get the property value.
+                        return "Cause of Death: " + d['Cause of Death'] + ' Count: ' + d.Count + ' Sex: ' + d.Sex ; // return the content that goes between '<p></p>' tags
+                    });
+        };
+    });
+
+
+</script>
+
+<p>
+
+</p>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>assignment 06t Bar Bar Chart</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+</head>
+<body>
+<script type="text/javascript">
+    var canvasWidth = 600px,
+        canvasHeight = 900px,
+
+
+
+
+    d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
+    	
+    	if ( error ) {
+    		console.error ( error ) ;
+    	} else {
+    		// otherwise, do stuff with the data
+    		dataset = data ;
+
+
+             d3.select ("body")
+                .append("svg")
+                .attr("width", 500px)
+                .attr("height", 500px)
+                .attr("fill", "red");
+
+
+
+
+
+
+
+
+
+
+    		d3.select ('body')
+    				.selectAll('p')	// important-select objects we're going to create
+    								// even though they don't exist yet
+    				.data(dataset)	// BIND dataset via data method to selection
+    				.enter()		// goes into our dataset, starts looping thru it. Doesn'take arguments
+    				.append('p') 	// add paragraph elements — for every single record, we append a p	
+    				.text ( function ( row, line_number ) {  	// anon function - review video at 25:50 for 									// explanation -- fuzzy
+    					// console.log ( row ) ;		// properties come from 1st row of csv file
+    					// .attr ('property', '' )
+    					return (line_number+1) + ". Place: " + row.Place + ", Area: " + row.Neighborhood + ", Rating: " + row.Rating + ", Drank there: " + row.Booze;	// append "Sex: " before the value being called; underscores for multiple words
+    					// ANOTHER OPTION: add underscores to source CSV, here. A_B_C
+
+
+    				} ) ;		
+    				
+
+    	}
+
+    	// generateVis();
+
+
+    }  )  ;
+
+</script>
+
+</body>
+</html>
