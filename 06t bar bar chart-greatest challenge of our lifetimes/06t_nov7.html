@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>assignment 06t Bar Bar Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+    
+    var canvasWidth = 600px ;
+        canvasHeight = 300px ;
+        padding = 25px ;
+        dataset;
+
+
+    var svg =   d3.select ("body")
+                .append ("svg") 
+                .attr ("width", canvasWidth)
+                .attr ("height", canvasHeight)
+                .attr ("fill", "red") ;
+
+
+d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
+        if ( error ) {
+            console.error ( error ) ;
+        } else {   // otherwise, do stuff with the data
+            dataset = data ;
+            }
+          }) ;
+
+
+            var svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+
+            var bar = d3.select ("svg")
+                  selectAll("rect")
+                  .data(dataset)
+                  .enter()
+                  .append("rect")
+                  .attr("x", function (data, index) {
+                    return index * (w / dataset.length);
+               })
+               .attr("y", function (data) {
+                    return height - (data.Rating * 5);
+               })
+               .attr("width", w / dataset.length - barPadding)
+               .attr("height", function (data) {
+                    return data * 6;
+               });
+            
+        </script>
+    </body>
+</html>
+
+
+
+
+
+
+<!-- 
+data =  data.map (function (rate){
+        rate["Rating"] = +rate["Rating"];
+        return rate;
+
+yScale.domain([0, d3.max(data, function(rate ){ return rate["Rating"]; })]);
+xScale.domain(data.map(function(rate){ return d["Place"]; }));
+
+svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .selectAll(".bar")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d){ return xScale(d["Age Group"]); })
+    .attr("y", function(d){ return yScale(d["Median Price"]); })
+    .attr("height", function(d){ return height - margin.top - margin.bottom - yScale(d["Median Price"]); })
+    .attr("width", function(d){ return xScale.rangeBand(); }); -->
