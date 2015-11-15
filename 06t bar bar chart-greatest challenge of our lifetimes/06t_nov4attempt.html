@@ -8,8 +8,10 @@
 </head>
 <body>
 <script type="text/javascript">
-    var canvasWidth = 600px ;
-        canvasHeight = 900px ;
+    var canvasWidth = 600 ;
+    var canvasHeight = 900 ;
+
+    var dataset ;
 
 
     var svg =   d3.select ("body")
@@ -22,28 +24,44 @@ d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
         if ( error ) {
             console.error ( error ) ;
         } else {   // otherwise, do stuff with the data
-            dataset = bostonbars ;
+            // dataset = bostonbars ;
+            dataset = data ;
+
 
             var svg = d3.select("body")
                         .append("svg")
-                        .attr("width", w)
-                        .attr("height", h);
-
+                        .attr("width", canvasWidth)
+                        .attr("height", canvasHeight);
+/*
             svg.selectAll("rect")
                .data(dataset)
                .enter()
                .append("rect")
                .attr("x", function(d, i) {
-                    return i * (w / dataset.length);
+                    return i * (canvasWidth / dataset.length);
                })
                .attr("y", function(d) {
-                    return h - (d * 4);
+                    return canvasHeight - (d * 4);
                })
-               .attr("width", w / dataset.length - barPadding)
+               .attr("width", canvasWidth / dataset.length - barPadding)
                .attr("height", function(d) {
-                    return d * 4;
-               });
-            
+                return d * 4;
+              });
+             */
+             }
+
+          }); 
+
+// function draw_bars () {
+//   console.log ( "dataset: " + dataset ) ;
+
+// }
+
+// function draw_something_else () {
+  
+// }
+
+
         </script>
 
 
@@ -70,13 +88,6 @@ svg.append("g")
     .attr("y", function(d){ return yScale(d["Median Price"]); })
     .attr("height", function(d){ return height - margin.top - margin.bottom - yScale(d["Median Price"]); })
     .attr("width", function(d){ return xScale.rangeBand(); }); -->
-
-
-
-});
-
-
-</script>
 
 </body>
 </html>
