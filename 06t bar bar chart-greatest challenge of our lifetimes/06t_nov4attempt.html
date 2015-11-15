@@ -1,3 +1,15 @@
+<!--
+
+Next steps:
+__Replace our math with scales.
+   Use linear scale for the x axis
+   Use ordinal scale for the y axis
+__Add a y axis
+__Add labels below the bars
+   Add the labels as an svg group, then use "transform" to rotate the group
+
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +20,13 @@
 </head>
 <body>
 <script type="text/javascript">
-    var canvasWidth = 600 ;
-    var canvasHeight = 900 ;
+    var canvasWidth = 900 ;
+    var canvasHeight = 600 ;
 
     var dataset ;
+    var height_ratio = 50 ;
+    var bar_padding = 5 ;
+    var label_offset = 100;
 
 d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
         if ( error ) {
@@ -25,6 +40,27 @@ d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
                         .append("svg")
                         .attr("width", canvasWidth)
                         .attr("height", canvasHeight);
+
+            svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function(d,i){
+              return (canvasWidth / dataset.length) * i; // 20 * i
+            })
+            .attr("y", function(d){
+              return canvasHeight - (d.Rating * height_ratio) - label_offset ;
+
+            })
+            .attr("height", function(d){
+              return d.Rating * height_ratio ;
+            })
+            .attr("width", function (){
+              return (canvasWidth / dataset.length) - bar_padding ; 
+            }) ;
+
+
+
 /*
             svg.selectAll("rect")
                .data(dataset)
@@ -47,6 +83,5 @@ d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
 
 
         </script>
-
 </body>
 </html>
