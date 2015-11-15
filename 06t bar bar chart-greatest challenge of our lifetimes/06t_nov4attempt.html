@@ -13,13 +13,6 @@
 
     var dataset ;
 
-
-    var svg =   d3.select ("body")
-                .append ("svg") 
-                .attr ("width", canvasWidth)
-                .attr ("height", canvasHeight)
-                .attr ("fill", "red") ;
-
 d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
         if ( error ) {
             console.error ( error ) ;
