@@ -52,42 +52,8 @@ d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
 
           }); 
 
-// function draw_bars () {
-//   console.log ( "dataset: " + dataset ) ;
-
-// }
-
-// function draw_something_else () {
-  
-// }
-
 
         </script>
-
-
-
-
-
-
-<!-- 
-data =  data.map (function (rate){
-        rate["Rating"] = +rate["Rating"];
-        return rate;
-
-yScale.domain([0, d3.max(data, function(rate ){ return rate["Rating"]; })]);
-xScale.domain(data.map(function(rate){ return d["Place"]; }));
-
-svg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    .selectAll(".bar")
-    .data(data)
-    .enter()
-    .append("rect")
-    .attr("class", "bar")
-    .attr("x", function(d){ return xScale(d["Age Group"]); })
-    .attr("y", function(d){ return yScale(d["Median Price"]); })
-    .attr("height", function(d){ return height - margin.top - margin.bottom - yScale(d["Median Price"]); })
-    .attr("width", function(d){ return xScale.rangeBand(); }); -->
 
 </body>
 </html>
