@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>MassArt D3 final project | working version</title>
+</head>
+
+<body>
+  <img src="http://goo.gl/2Fc1yy">
+  <h4>EMPLOYMENT FIGURES AND WAGE DATA FOR OECD MEMBER NATIONS</h4>
+  <p>
+    Short summary of what we're looking at can go here, here and here. Short summary of what we're looking at can go here, here and here. Short summary of what we're looking at can go here, here and here. Short summary of what we're looking at can go here, here and here. Short summary of what we're looking at can go here, here and here.<strong> Select two countries to compare below:</strong></p>
+
+    <table>
+  <tbody>
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Australia</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Greece</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Mexico</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Spain</button></td>
+    </tr>
+
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Belgium</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Hungary</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Netherlands</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Turkey</button></td>
+    </tr>
+
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Canada</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Ireland</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">New Zealand</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">United Kingdom</button></td>
+    </tr>
+
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Chile</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Israel</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Poland</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Estados Unidos</button></td>
+    </tr>
+
+        <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Czech Republic</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Japan</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Portugal</button></td>
+      <td> </td>
+    </tr>
+
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Estonia</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Korea</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Slovak Republic</button></td>
+      <td> </td>
+    </tr>
+
+    <tr>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">France</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Luxembourg</button></td>
+      <td><button type="button" onclick="alert('review CHAPTER 9')">Slovenia</button></td>
+      <td> </td>
+    </tr>
+   </tbody>
+  </table>
+    <br>
+    <br>
+<p><strong>MINIMUM WAGES: IN 2014 $USD PURCHASING POWER PARITY</strong></p>
+
+
+ <script src='http://d3js.org/d3.v3.min.js'></script>
+    <script>
+
+        // Convenience functions that provide parameters for
+        // the chart. In most cases these could be defined as
+        // CSS rules, but for this particular implementation
+        // we're avoiding CSS so that we can easily extract
+        // the SVG into a presentation.
+
+        // What colors are we going to use for the different
+        // datasets.
+        var color = function(i) {
+            var colors = ["#CA0000", "#A2005C",
+                          "#7EBD00", "#007979"];
+            return colors[i % colors.length]
+        };
+
+        // What symbols are we going to use for the different
+        // datasets.
+        var symbol = function(i) {
+            var symbols = ["circle", "diamond", "square",
+                           "triangle-up", "triangle-down", "cross"];
+            return d3.svg.symbol()
+                     .size(1)
+                     .type(symbols[i % symbols.length]);
+        };
+
+        // Define the dimensions of the visualization.
+        var margin = {top: 80, right: 140, bottom: 50, left: 50},
+            width = 636 - margin.left - margin.right,
+            height = 436 - margin.top - margin.bottom;
+
+        // Since this is a line chart, it graphs x- and y-values.
+        // Define scales for each. Both scales span the size of the
+        // chart. The x-scale is time-based (we're assuming months)
+        // and the y-scale is linear. Note that the y-scale
+        // ranges from `height` to 0 (opposite of what might be
+        // expected) because the SVG coordinate system places a
+        // y-value of `0` at the _top_ of the container.
+
+        // At this point we don't know the domain for either of
+        // the x- or y-values since that depends on the data
+        // itself (which we'll retrieve in a moment) so we only
+        // define the type of each scale and its range. We'll
+        // add a definition of the domain after we retrieve the
+        // actual data.
+        var x = d3.time.scale()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        // Define the axes for both x- and y-values. For the
+        // x-axis, we specify a format for the tick labels
+        // (just the month abbreviation) since we only have
+        // the month value for the data. (The year is unknown.)
+        // Without the override, D3 will try to display an
+        // actual date (e.g. with a year).
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .tickSize(0, 0, 0)
+            .tickPadding(10)
+            .tickFormat(d3.time.format("%b"))
+            .orient("bottom");
+
+        // For the y-axis we add grid lines by specifying a
+        // negative value for the major tick mark size. We
+        // set the size of the grid lines to be the entire
+        // width of the graph.
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .tickSize(-width, 0, 0)
+            .tickPadding(10)
+            .orient("left");
+
+        // Define a convenience function to create a line on
+        // the chart. The line's x-values are dates and the
+        // y-values are the temperature values. The result
+        // of this statement is that `line` will be a
+        // function that, when passed a selection with an
+        // associated array of data points, returns an SVG
+        // path whose coordinates match the x- and y-scales
+        // of the chart.
+        var line = d3.svg.line()
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.temp); });
+
+        // Create the SVG container for the visualization and
+        // define its dimensions. Within that container, add a
+        // group element (`<g>`) that can be transformed via
+        // a translation to account for the margins.
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left +
+                  "," + margin.top + ")");
+
+        // Define the data
+        var datasets = [{
+          "name": "Australia",
+          "data": [10, 10, 10, 10, 10, 10.0, 9.4, 9.1, 9.1, 9.0, 9.0, 9.4, 9.8, 9.7, 9.7, 9.5, 9.4, 9.7, 9.9, 10.1, 10.1, 10.0, 10.1, 10.2, 10.4, 10.5, 10.3, 10.6, 10.5, 10.6, 10.5, 10.6, 10.8, 10.8, 10.8]
+         },{
+          "name": "United States",
+          "data": [8.9, 8.7, 8.2, 8.0, 7.6, 7.4, 7.2, 7.0, 6.7, 6.4, 6.7, 7.2, 7.2, 7.0, 6.8, 6.6, 6.6, 7.2, 7.5, 7.3, 7.1, 6.9, 6.8, 6.6, 6.5, 6.2, 6.1, 6.2, 6.8, 7.6, 7.9, 7.6, 7.5, 7.4, 7.3]
+         },{
+          "name": "All ",
+          "data": [6.9, 7.2, 7.6, 7.8, 7.9, 8.1, 8.2, 8.2, 8.3, 8.3, 8.4, 8.5, 8.7, 8.7, 8.8, 8.9, 9.0, 9.2, 9.4, 9.5, 9.5, 9.7, 9.8, 10.0, 10.3, 10.7, 11.0, 11.1, 11.1, 11.3, 11.3, 11.2, 11.4, 11.4, 11.5]
+         },{
+          "name": "OECD",
+          "data": [6.9,  6.8, 6.8, 6.7, 6.2, 6.2, 6.3, 6.3, 5.6, 5.3, 5.1, 4.8, 4.8, 4.8, 4.7, 4.7, 4.8, 4.9, 4.7, 4.9, 5.2, 5.3, 5.4, 5.6, 5.7, 5.9, 5.9, 6.1, 6.2, 6.4, 6.5, 6.4, 6.4, 6.5, 6.6]
+        }];
+
+        // Convert the data into a more "understandable"
+        // JavaScript object. Instead of just an array
+        // of numbers, make it an array of objects with
+        // appropriate properties.
+        datasets.forEach(function(dataset) {
+            dataset.data = dataset.data.map(function(d,i) {
+
+                // Although no year is given for the data
+                // (so we won't display one), we can simply
+                // pick an abitrary year (2013, in this case)
+                // to use for our dates. We'll start in January
+                // and increment by the index of the data value.
+                // The data value itself is the temperature.
+                return {
+                    "date": d3.time.month.offset(
+                                new Date(2013,0,1), i),
+                    "temp": d
+                };
+            });
+        })
+
+        // Now that we have the data, we can calculate
+        // the domains for our x- and y-values. The x-values
+        // are a little tricky because we want to add additional
+        // space before and after the data. We start by getting
+        // the extent of the data, and then extending that range
+        // 16 days before the first date and 15 days after the
+         // last date. To account for datasets of differing
+        // lengths, we get the maximum length fromamong all
+            // datasets.
+            var xMin = new Date(2013,0,1),
+                xMax = d3.time.month.offset(xMin,
+                           d3.max(datasets,function(dataset) {
+                               return dataset.data.length-1;
+                       }));
+            x.domain([d3.time.day.offset(xMin,-16),
+                  d3.time.day.offset(xMax,15)]);
+
+        // For the y-values, we want the chart to show the minimum
+            // and maximum valuesfrom all the datasets.
+            var yMin = d3.min(datasets, function(dataset) {
+            return d3.min(dataset.data, function(d) {
+                    return d.temp;
+            });
+            });
+            var yMax = d3.max(datasets, function(dataset) {
+            return d3.max(dataset.data, function(d) {
+                return d.temp;
+            });
+        });
+
+        // The `.nice()` function gives the domain nice
+        // rounded limits.
+        y.domain([yMin, yMax]).nice();
+
+        // With the domains defined, we now have enough
+        // information to complete the axes. We position
+        // the x-axis by translating it below the chart.
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        // For the y-axis, we add a label.
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+          .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 9)
+            .attr("dy", ".71em")
+            .attr("text-anchor", "end")
+            .text(" ");
+
+        // Style the axes. As with other styles, these
+        // could be more easily defined in CSS. For this
+        // particular code, though, we're avoiding CSS
+        // to make it easy to extract the resulting SVG
+        // and paste it into a presentation.
+        svg.selectAll(".axis line, .axis path")
+            .attr("fill", "none")
+            .attr("stroke", "#bbbbbb")
+            .attr("stroke-width", "2px")
+            .attr("shape-rendering", "crispEdges");
+
+        svg.selectAll(".axis text")
+            .attr("font-size", "14");
+
+        svg.selectAll(".axis .tick line")
+            .attr("stroke", "#d0d0d0")
+            .attr("stroke-width", "1");
+
+
+        // Plot the data and the legend
+        datasets.forEach(function(dataset, i) {
+
+            // Individual points
+            svg.selectAll(".point.dataset-" + i)
+                .data(dataset.data)
+              .enter().append("path")
+                .attr("class", "point dataset-" + i)
+                .attr("fill", color(i))
+                .attr("stroke", color(i))
+                .attr("d", symbol(i))
+                .attr("transform", function(d) {
+                    return "translate(" + x(d.date) +
+                                      "," + y(d.temp) + ")";
+                });
+
+            // Connect the points with lines
+            svg.append("path")
+                .datum(dataset.data)
+                .attr("class", "line dataset-" + i)
+                .attr("fill", "none")
+                .attr("stroke", color(i))
+                .attr("stroke-width", "2")
+                .attr("d", line);
+
+            // Legend. In general, it would be cleaner
+            // to create an SVG group for the legend,
+            // position that group, and then position
+            // the individual elements of the legend
+            // relative to the group. We're not doing
+            // it in this case because we want to do
+            // some fancy animation tricks with the
+            // resulting SVG within the presentation.
+            d3.select("svg").append("path")
+                .attr("class", "point dataset-" + i)
+                .attr("fill", color(i))
+                .attr("stroke", color(i))
+                .attr("d", symbol(i))
+                .attr("transform", "translate(" +
+                    (margin.left + width + 40) + "," +
+                    (20*i + margin.top + height/2 -
+                     20*datasets.length/2 - 6) + ")");
+
+            d3.select("svg").append("line")
+                .attr("class", "line dataset-" + i)
+                .attr("stroke", color(i))
+                .attr("stroke-width", "2")
+                .attr("x1", margin.left + width + 30)
+                .attr("x2", margin.left + width + 50)
+                .attr("y1", 20*i + margin.top + height/2 -
+                            20*datasets.length/2 - 6)
+                .attr("y2", 20*i + margin.top + height/2 -
+                            20*datasets.length/2 - 6);
+
+        });
+
+        // Chart decoration. Once more we're avoiding
+        // CSS for styling, but usually that would be
+        // a better approach.
+        d3.select("svg").append("text")
+            .attr("transform", "translate(" +
+                (margin.left + width/2 + 20) + ",20)")
+            .attr("class", "title")
+            .attr("font-size", "20")
+            .attr("text-anchor", "middle")
+            .text(" ");
+
+        d3.select("svg").append("text")
+            .attr("transform", "translate(" +
+                (margin.left + width/2 + 20) + ",48)")
+            .attr("class", "subtitle")
+            .attr("font-size", "15")
+            .attr("text-anchor", "middle")
+            .text(" ");
+
+    </script>
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+</head>
+<body>
+<script type="text/javascript">
+    var canvasWidth = 900 ;
+    var canvasHeight = 600 ;
+
+    var dataset ;
+    var height_ratio = 50 ;
+    var bar_padding = 5 ;
+    var label_offset = 100;
+
+d3.csv ( 'bostonbars.csv', function ( error, data ) {     //anonymous function
+        if ( error ) {
+            console.error ( error ) ;
+        } else {   // otherwise, do stuff with the data
+            // dataset = bostonbars ;
+            dataset = data ;
+
+
+            var svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", canvasWidth)
+                        .attr("height", canvasHeight);
+
+            svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function(d,i){
+              return (canvasWidth / dataset.length) * i; // 20 * i
+            })
+            .attr("y", function(d){
+              return canvasHeight - (d.Rating * height_ratio) - label_offset ;
+
+            })
+            .attr("height", function(d){
+              return d.Rating * height_ratio ;
+            })
+            .attr("width", function (){
+              return (canvasWidth / dataset.length) - bar_padding ; 
+            }) ;
+             }
+          }); 
+
+
+        </script>
+
+<p><strong>UNEMPLOYMENT RATES: ANNUAL, CIVILIAN WORKING-AGE POPULATION</strong></p>
+
+    <script>
+
+        // Convenience functions that provide parameters for
+
+        var color = function(i) {
+            var colors = ["#CA0000", "#A2005C",
+                          "#7EBD00", "#007979"];
+            return colors[i % colors.length]
+        };
+
+        // What symbols are we going to use for the different
+        // datasets.
+        var symbol = function(i) {
+            var symbols = ["circle", "diamond", "square",
+                           "triangle-up", "triangle-down", "cross"];
+            return d3.svg.symbol()
+                     .size(1)
+                     .type(symbols[i % symbols.length]);
+        };
+
+        // Define the dimensions of the visualization.
+        var margin = {top: 80, right: 140, bottom: 50, left: 50},
+            width = 636 - margin.left - margin.right,
+            height = 436 - margin.top - margin.bottom;
+
+        // Since this is a line chart, it graphs x- and y-values.
+
+        var x = d3.time.scale()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        // Define the axes for both x- and y-values. For the
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .tickSize(0, 0, 0)
+            .tickPadding(10)
+            .tickFormat(d3.time.format("%b"))
+            .orient("bottom");
+
+        // For the y-axis we add grid lines by specifying a
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .tickSize(-width, 0, 0)
+            .tickPadding(10)
+            .orient("left");
+
+        // Define a convenience function to create a line on
+
+        var line = d3.svg.line()
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.temp); });
+
+        // Create the SVG container for the visualization and
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left +
+                  "," + margin.top + ")");
+
+        // Define the data
+        var datasets = [{
+          "name": "Australia",
+          "data": [6.1,  5.8, 7.2, 10,  9,   8.3, 8.1, 8.1, 7.2, 6.2, 6.9, 9.6, 10.7,    10.9,    9.7, 8.5, 8.5, 8.4, 7.7, 6.9, 6.3, 6.7, 6.4, 5.9, 5.4, 5,   4.8, 4.4, 4.2, 5.6, 5.2, 5.1, 5.2, 5.7, 6.1]
+         },{
+          "name": "United States",
+          "data": [7.1,  7.6, 9.7, 9.6, 7.5, 7.2, 7,   6.2, 5.5, 5.3, 5.6, 6.8, 7.5, 6.9, 6.1, 5.6, 5.4, 4.9, 4.5, 4.2, 4,   4.7, 5.8, 6,   5.5, 5.1, 4.6, 4.6, 5.8, 9.3, 9.6, 8.9, 8.1, 7.4, 6.2]
+         },{
+          "name": "France",
+          "data": [5.4,  6.3, 6.9, 7.2, 8.4, 9,   9,   9.1, 8.8, 8.2, 7.6, 7.7, 8.6, 9.6, 10.2,    9.6, 10.1,    10.2,    9.7, 9.3, 8,   7.2, 7.4, 8,   8.3, 8.3, 8.3, 7.5, 7,   8.6, 8.8, 8.6, 9.2, 9.7]
+         },{
+          "name": "All OECD",
+          "data": [0.2,  7.3, 8.5, 9.5, 9.7, 9,   8.8, 8.5, 8,   7.1, 6.2, 7.4, 8,   8.9, 9.1, 8.7, 8.2, 8,   7.9, 8,   7.6, 7.4, 7.7, 7.7, 7.8, 7.4, 6.8, 6.1, 6.1, 8.5, 9.1, 9,   9.5, 9.8, 9.8]
+        }];
+
+        // Convert the data into a more "understandable"
+
+        datasets.forEach(function(dataset) {
+            dataset.data = dataset.data.map(function(d,i) {
+
+                // Although no year is given for the data
+
+                return {
+                    "date": d3.time.month.offset(
+                                new Date(2013,0,1), i),
+                    "temp": d
+                };
+            });
+        })
+
+        // Now that we have the data, we can calculate
+        // the domains for our x- and y-values.
+            var xMin = new Date(2013,0,1),
+                xMax = d3.time.month.offset(xMin,
+                           d3.max(datasets,function(dataset) {
+                               return dataset.data.length-1;
+                       }));
+            x.domain([d3.time.day.offset(xMin,-16),
+                  d3.time.day.offset(xMax,15)]);
+
+        // For the y-values, we want the chart to show the minimum
+            // and maximum valuesfrom all the datasets.
+            var yMin = d3.min(datasets, function(dataset) {
+            return d3.min(dataset.data, function(d) {
+                    return d.temp;
+            });
+            });
+            var yMax = d3.max(datasets, function(dataset) {
+            return d3.max(dataset.data, function(d) {
+                return d.temp;
+            });
+        });
+
+        // The `.nice()` function gives the domain nice
+        // rounded limits.
+        y.domain([yMin, yMax]).nice();
+
+        // With the domains defined, we now have enough
+        // information to complete the axes. We position
+        // the x-axis by translating it below the chart.
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        // For the y-axis, we add a label.
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+          .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 9)
+            .attr("dy", ".71em")
+            .attr("text-anchor", "end")
+            .text(" ");
+
+        // Style the axes.
+        svg.selectAll(".axis line, .axis path")
+            .attr("fill", "none")
+            .attr("stroke", "#bbbbbb")
+            .attr("stroke-width", "2px")
+            .attr("shape-rendering", "crispEdges");
+
+        svg.selectAll(".axis text")
+            .attr("font-size", "14");
+
+        svg.selectAll(".axis .tick line")
+            .attr("stroke", "#d0d0d0")
+            .attr("stroke-width", "1");
+
+
+        // Plot the data and the legend
+        datasets.forEach(function(dataset, i) {
+
+            // Individual points
+            svg.selectAll(".point.dataset-" + i)
+                .data(dataset.data)
+              .enter().append("path")
+                .attr("class", "point dataset-" + i)
+                .attr("fill", color(i))
+                .attr("stroke", color(i))
+                .attr("d", symbol(i))
+                .attr("transform", function(d) {
+                    return "translate(" + x(d.date) +
+                                      "," + y(d.temp) + ")";
+                });
+
+            // Connect the points with lines
+            svg.append("path")
+                .datum(dataset.data)
+                .attr("class", "line dataset-" + i)
+                .attr("fill", "none")
+                .attr("stroke", color(i))
+                .attr("stroke-width", "2")
+                .attr("d", line);
+
+            // Legend.
+            d3.select("svg").append("path")
+                .attr("class", "point dataset-" + i)
+                .attr("fill", color(i))
+                .attr("stroke", color(i))
+                .attr("d", symbol(i))
+                .attr("transform", "translate(" +
+                    (margin.left + width + 40) + "," +
+                    (20*i + margin.top + height/2 -
+                     20*datasets.length/2 - 6) + ")");
+
+            d3.select("svg").append("line")
+                .attr("class", "line dataset-" + i)
+                .attr("stroke", color(i))
+                .attr("stroke-width", "2")
+                .attr("x1", margin.left + width + 30)
+                .attr("x2", margin.left + width + 50)
+                .attr("y1", 20*i + margin.top + height/2 -
+                            20*datasets.length/2 - 6)
+                .attr("y2", 20*i + margin.top + height/2 -
+                            20*datasets.length/2 - 6);
+
+            d3.select("svg").append("text")
+                .attr("transform", "translate(" +
+                    (margin.left + width + 60) + "," +
+                    (20*i + margin.top + height/2 -
+                     20*datasets.length/2) + ")")
+                .attr("class", "legend")
+                .attr("font-size", "15")
+                .attr("text-anchor", "left")
+                .text(dataset.name);
+
+        });
+
+        // Chart decoration.
+        d3.select("svg").append("text")
+            .attr("transform", "translate(" +
+                (margin.left + width/2 + 20) + ",20)")
+            .attr("class", "title")
+            .attr("font-size", "20")
+            .attr("text-anchor", "middle")
+            .text(" ");
+
+        d3.select("svg").append("text")
+            .attr("transform", "translate(" +
+                (margin.left + width/2 + 20) + ",48)")
+            .attr("class", "subtitle")
+            .attr("font-size", "15")
+            .attr("text-anchor", "middle")
+            .text(" ");
+
+    </script>
+
+    <p>Source: OECD</p>
+
+</body>
+
+</html>
