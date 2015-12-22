@@ -1,0 +1,39 @@
+    body {
+      text-align: left;
+      background: white;
+      color: gray;
+      font-family: helvetica;
+      margin-top: 20px;
+      margin-left: 20px;
+    }    
+    
+    a {
+      color: orange;
+    }
+
+    h2 {
+      color: gray;
+      font-size: 20px;
+      margin-top: 5px;
+    }
+
+     h4 {
+      color: gray;
+      font-size: 14px;
+      font-weight: lighter;
+    }
+
+    p {
+      text-align: left;
+      color: black;
+      font-family: helvetica;
+      font-size: 16px;
+    }
+
+    li {
+      color: gray;
+      font-size: 16px;
+      font-style: ;
+      margin-top: 10px;
+    }
+
